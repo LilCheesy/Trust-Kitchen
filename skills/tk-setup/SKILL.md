@@ -59,7 +59,8 @@ Do not use it to change the merge policy alone. Edit `.trust-kitchen/policy.json
 
 7. **Policy.** Keep `.trust-kitchen/policy.json` at `auto_merge: false` unless the owner explicitly asks
    otherwise. Explain the conditions for turning it on (see `tk-merge-gate`). A hard PR-size cap, if the team wants
-   one, is `max_lines` in this file (none by default).
+   one, is `max_lines` in this file (none by default). Keep `ci_major_blocks: false` until the team has measured
+   the scanner's false alarms on its own PRs (see `tk-ci`).
 8. **Self-check the scripts:**
 
    ```

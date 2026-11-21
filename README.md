@@ -162,7 +162,7 @@ Each role greets you with a menu of codes and routes them to the skills below.
 | `tk-investigate` | Read-only root-cause analysis: reproduce, trace to the first wrong place, test hypotheses, report the fix direction. |
 | `tk-build` | Red → green → clean in small steps inside the approved files, with self-scan and the project's checks. |
 | `tk-pr` | Small logical commits and a one-minute PR body: what and why, changes, evidence, risk, rollback, not tested. |
-| `tk-ci` | Adds the deterministic review and the merge gate to CI, run with tools and policy from the base branch so a PR cannot change its own judge; pinned actions, least privilege, an optional single comment on the PR; proves it fails on a bad PR. |
+| `tk-ci` | Adds the deterministic review and the merge gate to CI, run with tools and policy from the base branch so a PR cannot change its own judge; pinned actions, least privilege, an optional single comment on the PR; owners dismiss false alarms with a `tk:dismiss` label; a clean, checked and verified PR reaches MERGE; proves it fails on a bad PR. |
 | `tk-create-verification` | Creates a project `verify-<app>` skill (launch, doctor, drive, evidence, cleanup, feature map) and proves it works and can fail. |
 
 ### Review

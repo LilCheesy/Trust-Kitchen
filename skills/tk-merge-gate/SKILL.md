@@ -29,7 +29,8 @@ Do not use it to merge. The gate only decides; a person or CI acts on the decisi
 | `budget_exhausted` | bool |
 | `docs_only` | bool |
 
-Optionally `.trust-kitchen/policy.json`: `auto_merge`, `max_lines`, `min_confidence_to_block`.
+Optionally `.trust-kitchen/policy.json`: `auto_merge`, `max_lines`, `min_confidence_to_block`, and for CI only
+`ci_major_blocks` (read by `tk_ci_facts.py`; see `tk-ci`).
 
 ## Procedure
 

@@ -40,14 +40,26 @@ Do not use it to give CI secrets to code from forks, or to auto-merge by itself.
    - End them with `echo "TK_CHECKS=passed" >> "$GITHUB_ENV"`.
    - Without that line the gate sees the checks as missing and never says MERGE: nothing ran, so nothing is
      proven.
+   - **Optional, for MERGE:** add a step that runs the real thing (end-to-end tests, or the project's
+     `verify-<app>` skill as a script) and ends with `echo "TK_VERIFY=passed" >> "$GITHUB_ENV"`.
+   - With checks and verify passed, a clean PR outside restricted areas gets **MERGE**. Without it, every code PR is
+     NEEDS_HUMAN: the check is green and a person merges.
 6. **What the check does:**
    - It runs from the workspace root with isolated Python (`python -I`). A file in the PR such as `json.py` cannot
      be imported by the tools.
    - The scanner ignores the PR's own `.gitattributes`, so a PR cannot hide its diff.
-   - Scanner MAJOR hits are pattern matches (`setTimeout`, `# noqa`, `innerHTML`). In CI they are shown as unproven
-     for a person to confirm or dismiss, and never turn the check red on their own. BLOCKERs do: a secret, a deleted
-     or skipped test, prompt injection.
-   - It scans the diff, builds the gate facts and runs `merge_gate.py`.
+   - It scans the diff, builds the gate facts (`tk_ci_facts.py`) and runs `merge_gate.py`.
+   - **Scanner MAJOR hits** are pattern matches (`setTimeout`, `# noqa`, `innerHTML`). With the default policy
+     (`"ci_major_blocks": false`) they are shown for a person to confirm or dismiss, and never turn the check red on
+     their own.
+     - Set `"ci_major_blocks": true` in `policy.json` once the repository has measured few false alarms and the
+       team uses the dismissal label below.
+   - **BLOCKERs always turn it red:** a secret, a deleted or skipped test, prompt injection.
+   - **Dismissing a false alarm:** a person with write or triage access adds the label **`tk:dismiss`** to the PR.
+     - The run started by that label marks the scanner's BLOCKER / MAJOR findings "dismissed by @<who> for
+       <commit>". They stop blocking, and the note appears in the job summary and the PR comment.
+     - A new push needs a new dismissal: remove the label and add it again.
+     - A dismissal never covers restricted areas or failing project checks.
    - **CHANGES_REQUESTED fails the check.**
    - **NEEDS_HUMAN passes the check**, but writes the reasons to the job summary. Examples: a restricted area, or
      behaviour CI cannot run. A person merges.
@@ -86,6 +98,8 @@ Do not use it to give CI secrets to code from forks, or to auto-merge by itself.
 - NEVER give a job write access it does not need.
 - MUST pin third-party actions to a commit SHA.
 - MUST treat a scanner error (exit 2) as a failed check.
+- NEVER let a PR author dismiss their own findings. The `tk:dismiss` label needs write or triage access, which is
+  why fork authors cannot use it. On a small team where the author is also an owner, write the reason in the PR.
 
 ## Stop and ask
 

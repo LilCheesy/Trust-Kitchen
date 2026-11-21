@@ -1,5 +1,6 @@
 {
   "auto_merge": false,
   "max_lines": null,
-  "min_confidence_to_block": 3
+  "min_confidence_to_block": 3,
+  "ci_major_blocks": false
 }

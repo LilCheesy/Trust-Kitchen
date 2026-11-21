@@ -6,6 +6,8 @@ name: trust-kitchen
 
 on:
   pull_request:
+    # labeled / unlabeled: the owner can dismiss false alarms with the `tk:dismiss` label (see "Scan and gate")
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 permissions:
   contents: read
@@ -36,17 +38,28 @@ jobs:
       # - run: npm ci && npm run lint && npm test
       #   working-directory: pr
       # - run: echo "TK_CHECKS=passed" >> "$GITHUB_ENV"
+      # Optional: run the real thing (end-to-end tests, or the project's verify-<app> skill as a script). If it passes,
+      # record it; with checks and verify passed, a clean PR outside restricted areas gets MERGE instead of NEEDS_HUMAN:
+      # - run: npm run e2e
+      #   working-directory: pr
+      # - run: echo "TK_VERIFY=passed" >> "$GITHUB_ENV"
       - name: Scan and gate
         # Runs from the workspace root, never inside `pr`, and every python is isolated (-I): a file such as
         # pr/json.py must not be importable by the review tools.
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_BODY: ${{ github.event.pull_request.body }}
+          TK_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          # Set only for the run started by adding the `tk:dismiss` label (only people with write / triage access can
+          # label). A new push starts a run without it, so every new commit needs a fresh dismissal.
+          TK_DISMISSED_BY: ${{ github.event.action == 'labeled' && github.event.label.name == 'tk:dismiss' && github.event.sender.login || '' }}
         run: |
           TK="$PWD/base/.trust-kitchen"
-          if [ ! -f "$TK/scripts/tk_scan.py" ]; then
-            echo "Trust Kitchen is not on the base branch yet: merge the install first." >&2; exit 1
-          fi
+          for s in tk_scan.py tk_ci_facts.py merge_gate.py; do
+            if [ ! -f "$TK/scripts/$s" ]; then
+              echo "Trust Kitchen (with $s) is not on the base branch yet: install or update it there first." >&2; exit 1
+            fi
+          done
           printf '%s' "$PR_BODY" > pr.md
           CFG=(); [ -f "$TK/config.json" ] && CFG=(--config "$TK/config.json")
           set +e
@@ -54,21 +67,11 @@ jobs:
           SCAN=$?
           set -e
           if [ "$SCAN" -eq 2 ]; then echo "The scanner could not run: nothing was checked." >&2; exit 1; fi
-          python -I - <<'PY'
-          import json, os
-          scan = json.load(open("scan.json", encoding="utf-8"))
-          findings = []
-          for f in scan["findings"]:
-              if f.get("severity") == "MAJOR":  # pattern hits a person may dismiss: shown, never a red check alone
-                  f = {**f, "confidence": 2, "why": f["why"] + " (heuristic: confirm or dismiss in review)"}
-              findings.append(f)
-          facts = {"deterministic": os.environ.get("TK_CHECKS") or "missing",  # set by the project's check steps
-                   "verify": "not_applicable" if scan["stats"]["docs_only"] else "missing",
-                   "docs_only": scan["stats"]["docs_only"], "changed_lines": scan["stats"]["changed_lines"],
-                   "areas": scan["areas"], "findings": findings}
-          json.dump(facts, open("facts.json", "w", encoding="utf-8"))
-          PY
           POLICY=(); [ -f "$TK/policy.json" ] && POLICY=(--policy "$TK/policy.json")
+          # heuristic MAJOR blocks only if policy.json sets "ci_major_blocks": true; TK_CHECKS / TK_VERIFY /
+          # TK_DISMISSED_BY come from the steps above and the label event
+          python -I "$TK/scripts/tk_ci_facts.py" scan.json "${POLICY[@]}" > facts.json
+          python -I -c "import json;[print('-',n) for n in json.load(open('facts.json')).get('notes',[])]" | tee -a "$GITHUB_STEP_SUMMARY"
           set +e
           python -I "$TK/scripts/merge_gate.py" facts.json "${POLICY[@]}" > verdict.json
           GATE=$?
@@ -84,6 +87,7 @@ jobs:
           name: trust-kitchen
           path: |
             scan.json
+            facts.json
             verdict.json
           if-no-files-found: warn
 
@@ -119,14 +123,14 @@ jobs:
               s = s.replace(">", "&gt;").replace("[", "\\[").replace("]", "\\]").replace("@", "@​").replace("://", ":/​/")
               return " ".join(s.split())[:200]
           head = os.environ["HEAD_SHA"]
-          scan, verdict = load("scan.json"), load("verdict.json")
+          scan, verdict, facts = load("scan.json"), load("verdict.json"), load("facts.json") or {}
           order = ["BLOCKER", "MAJOR", "MINOR", "NIT"]
           body = f"<!-- trust-kitchen-review -->\n## Trust Kitchen deterministic review\n\n"
           body += "> Information for the repository owner. Trust Kitchen does not approve or merge; the decision is yours.\n\n"
           if scan is None or verdict is None:
               body += "**The review did not produce results** (see the workflow run). Nothing was checked.\n"
           else:
-              body += f"**Verdict:** {cell(verdict['verdict'])}\n\n" + "".join(f"- {cell(r)}\n" for r in verdict["reasons"] + verdict.get("notes", []))
+              body += f"**Verdict:** {cell(verdict['verdict'])}\n\n" + "".join(f"- {cell(r)}\n" for r in verdict["reasons"] + verdict.get("notes", []) + facts.get("notes", []))
               fs = sorted(scan.get("findings", []), key=lambda f: order.index(f["severity"]) if f.get("severity") in order else 9)
               if fs:
                   body += "\n| Severity | Where | Rule | Problem | Fix |\n|---|---|---|---|---|\n"
