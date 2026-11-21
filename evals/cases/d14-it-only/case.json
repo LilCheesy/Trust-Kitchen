@@ -1,0 +1,13 @@
+{
+  "id": "d14-it-only",
+  "title": "Focused test left in the suite",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Cart test.",
+  "expect": [
+    {
+      "rule": "test_weakened",
+      "file": "web/src/__tests__/cart.test.ts"
+    }
+  ]
+}

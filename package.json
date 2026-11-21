@@ -1,0 +1,11 @@
+{
+  "name": "trust-kitchen",
+  "version": "0.3.0",
+  "description": "Skills for agent-assisted engineering you can trust: evidence-first work, parallel review with a merge gate, defensive security, learn-rules.",
+  "license": "MIT",
+  "bin": { "trust-kitchen": "bin/trust-kitchen.js" },
+  "files": ["bin/", "installer/", "skills/", "agents/", "scripts/", "schema/", "evals/run_eval.py", "evals/cases/"],
+  "engines": { "node": ">=18" },
+  "repository": { "type": "git", "url": "https://github.com/LilCheesy/Trust-Kitchen.git" },
+  "keywords": ["agent-skills", "code-review", "pull-request", "security", "quality"]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "trust-kitchen",
+  "owner": { "name": "LilCheesy" },
+  "plugins": [
+    {
+      "name": "trust-kitchen",
+      "source": "./",
+      "description": "Evidence-first agent work, parallel code / PR review with a merge gate, defensive security review, learn-rules loop."
+    }
+  ]
+}

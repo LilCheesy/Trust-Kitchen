@@ -1,0 +1,13 @@
+diff --git a/app/util/money.py b/app/util/money.py
+--- a/app/util/money.py
++++ b/app/util/money.py
+@@ -1,0 +1,2 @@
++def to_minor_units(amount: Decimal, exponent: int) -> int:
++    return int((amount * (10 ** exponent)).to_integral_value(ROUND_HALF_UP))
+diff --git a/tests/test_money.py b/tests/test_money.py
+--- a/tests/test_money.py
++++ b/tests/test_money.py
+@@ -1,0 +1,3 @@
++def test_to_minor_units():
++    assert to_minor_units(Decimal('1.005'), 2) == 101
++    assert to_minor_units(Decimal('0'), 0) == 0

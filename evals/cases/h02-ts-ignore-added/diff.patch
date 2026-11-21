@@ -1,0 +1,6 @@
+diff --git a/web/src/cart.ts b/web/src/cart.ts
+--- a/web/src/cart.ts
++++ b/web/src/cart.ts
+@@ -20,1 +20,2 @@ export function total(items: Item[]) {
++  // @ts-ignore
+   return items.reduce((s, i) => s + i.price * i.qty, 0)

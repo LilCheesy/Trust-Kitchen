@@ -1,0 +1,25 @@
+{
+  "_comment": "Where each agent looks for skills / rules / slash commands. Source: each vendor's documentation, checked 2026-11-20 (the Cline and Kiro skill folders are not yet confirmed in their own docs). Shared by installer/install.py and bin/trust-kitchen.js. In command texts, {skills_dir} is replaced by the agent's skills folder.",
+  "version": "0.3.0",
+  "agents": {
+    "claude-code": { "label": "Claude Code", "skills_dir": ".claude/skills", "agents_dir": ".claude/agents" },
+    "codex":       { "label": "OpenAI Codex CLI", "skills_dir": ".agents/skills" },
+    "cursor":      { "label": "Cursor", "skills_dir": ".agents/skills" },
+    "gemini":      { "label": "Gemini CLI", "skills_dir": ".agents/skills", "rules": [{ "path": "GEMINI.md" }],
+                     "commands": [{ "path": ".gemini/commands/tk.toml", "text": "description = \"Trust Kitchen: /tk [command] [args], e.g. /tk review 42\"\nprompt = \"\"\"\nLoad the FULL {skills_dir}/tk/SKILL.md, read all of it, and follow it exactly.\n\nARGUMENTS: {{args}}\n\"\"\"\n" }] },
+    "windsurf":    { "label": "Windsurf / Devin", "skills_dir": ".agents/skills" },
+    "copilot":     { "label": "GitHub Copilot", "skills_dir": ".github/skills", "rules": [{ "path": ".github/copilot-instructions.md" }] },
+    "cline":       { "label": "Cline", "skills_dir": ".cline/skills", "rules": [{ "path": ".clinerules/trust-kitchen.md" }] },
+    "kiro":        { "label": "Kiro", "skills_dir": ".kiro/skills", "rules": [{ "path": ".kiro/steering/trust-kitchen.md", "front": "---\ninclusion: always\n---\n\n" }] },
+    "opencode":    { "label": "OpenCode", "skills_dir": ".agents/skills", "rules": [{ "path": "AGENTS.md" }],
+                     "commands": [{ "path": ".opencode/commands/tk.md", "text": "---\ndescription: Trust Kitchen - /tk [command] [args], e.g. /tk review 42\n---\n\nLoad the FULL {skills_dir}/tk/SKILL.md, read all of it, and follow it exactly.\n\nARGUMENTS: $ARGUMENTS\n" }] }
+  },
+  "always": {
+    "agents_md": "AGENTS.md",
+    "scripts_dir": ".trust-kitchen/scripts",
+    "fallback_skills_dir": ".trust-kitchen/skills",
+    "policy": ".trust-kitchen/policy.json",
+    "manifest": ".trust-kitchen/install.json",
+    "evals": { "from": "evals", "to": ".trust-kitchen/evals", "skip": ["results"] }
+  }
+}

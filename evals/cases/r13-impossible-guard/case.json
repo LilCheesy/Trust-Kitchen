@@ -1,0 +1,13 @@
+{
+  "id": "r13-impossible-guard",
+  "title": "Guards for values the types guarantee, errors swallowed",
+  "layer": "review",
+  "clean": false,
+  "description": "Make total() robust.",
+  "expect": [
+    {
+      "category": "slop",
+      "file": "app/orders/total.py"
+    }
+  ]
+}

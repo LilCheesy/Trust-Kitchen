@@ -1,0 +1,13 @@
+diff --git a/app/shipping/fee.py b/app/shipping/fee.py
+--- a/app/shipping/fee.py
++++ b/app/shipping/fee.py
+@@ -1,0 +1,2 @@
++def fee(kg):
++    return 15000 + max(0, kg - 1) * 4000
+diff --git a/tests/test_fee.py b/tests/test_fee.py
+--- a/tests/test_fee.py
++++ b/tests/test_fee.py
+@@ -1,0 +1,3 @@
++def test_fee():
++    for kg in range(10):
++        assert fee(kg) == 15000 + max(0, kg - 1) * 4000

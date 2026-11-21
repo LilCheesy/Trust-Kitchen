@@ -1,0 +1,6 @@
+diff --git a/app/imports/config.py b/app/imports/config.py
+--- a/app/imports/config.py
++++ b/app/imports/config.py
+@@ -8,1 +8,1 @@
+-    cfg = yaml.load(upload.read(), Loader=yaml.SafeLoader)
++    cfg = yaml.safe_load(upload.read())

@@ -1,0 +1,6 @@
+diff --git a/app/sync/worker.py b/app/sync/worker.py
+--- a/app/sync/worker.py
++++ b/app/sync/worker.py
+@@ -88,1 +88,2 @@
+         save(job)
++        time.sleep(2)  # give the db time to commit

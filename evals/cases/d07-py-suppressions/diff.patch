@@ -1,0 +1,6 @@
+diff --git a/app/auth/tokens.py b/app/auth/tokens.py
+--- a/app/auth/tokens.py
++++ b/app/auth/tokens.py
+@@ -10,0 +10,2 @@
++def decode(token):  # noqa: C901
++    return jwt.decode(token, KEY)  # type: ignore

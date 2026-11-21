@@ -1,0 +1,13 @@
+{
+  "id": "d05-empty-catch",
+  "title": "Errors from payment SDK swallowed",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Stop checkout page from crashing.",
+  "expect": [
+    {
+      "rule": "symptom_fix",
+      "file": "web/src/checkout.js"
+    }
+  ]
+}

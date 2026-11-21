@@ -1,0 +1,13 @@
+{
+  "id": "d03-deleted-test",
+  "title": "Test for double refund deleted",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Remove obsolete test.",
+  "expect": [
+    {
+      "rule": "test_weakened",
+      "file": "tests/test_refunds.py"
+    }
+  ]
+}

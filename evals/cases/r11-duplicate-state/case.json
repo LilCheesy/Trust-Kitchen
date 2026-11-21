@@ -1,0 +1,13 @@
+{
+  "id": "r11-duplicate-state",
+  "title": "Second copy of the 'active' flag",
+  "layer": "review",
+  "clean": false,
+  "description": "Add account status.",
+  "expect": [
+    {
+      "category": "architecture",
+      "file": "app/accounts/models.py"
+    }
+  ]
+}

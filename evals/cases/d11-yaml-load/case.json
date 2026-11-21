@@ -1,0 +1,13 @@
+{
+  "id": "d11-yaml-load",
+  "title": "Unsafe YAML load of an uploaded file",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Import settings from YAML.",
+  "expect": [
+    {
+      "rule": "dangerous_call",
+      "file": "app/imports/config.py"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"id": "h03-exec-user-input", "title": "Shell command built from request data", "layer": "deterministic", "clean": false, "split": "holdout", "description": "Add a thumbnail endpoint.", "expect": [{"rule": "dangerous_call", "file": "api/thumbs.js"}]}

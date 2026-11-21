@@ -1,0 +1,13 @@
+{
+  "id": "r02-admin-endpoint-no-authz",
+  "title": "New delete endpoint only checks login",
+  "layer": "review",
+  "clean": false,
+  "description": "Admins can delete users.",
+  "expect": [
+    {
+      "category": "security",
+      "file": "app/api/users.py"
+    }
+  ]
+}

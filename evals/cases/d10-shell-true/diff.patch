@@ -1,0 +1,5 @@
+diff --git a/app/export/pdf.py b/app/export/pdf.py
+--- a/app/export/pdf.py
++++ b/app/export/pdf.py
+@@ -14,0 +14,1 @@
++    subprocess.run(f'wkhtmltopdf {src} {request.args["name"]}.pdf', shell=True)

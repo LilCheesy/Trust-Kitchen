@@ -1,0 +1,13 @@
+{
+  "id": "d02-skipped-test",
+  "title": "Failing refund test skipped",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Unblock CI.",
+  "expect": [
+    {
+      "rule": "test_weakened",
+      "file": "tests/test_refunds.py"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "r06-test-mirrors-code",
+  "title": "Test recomputes the expected value with the same formula",
+  "layer": "review",
+  "clean": false,
+  "description": "Shipping fee by weight.",
+  "expect": [
+    {
+      "category": "tests",
+      "file": "tests/test_fee.py"
+    }
+  ]
+}

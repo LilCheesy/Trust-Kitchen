@@ -1,0 +1,13 @@
+{
+  "id": "r04-scope-creep",
+  "title": "Typo fix also changes timeout and rounding",
+  "layer": "review",
+  "clean": false,
+  "description": "Fix typo in receipt title.",
+  "expect": [
+    {
+      "category": "intent",
+      "file": "app/billing/config.py"
+    }
+  ]
+}

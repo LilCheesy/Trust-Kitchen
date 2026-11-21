@@ -1,0 +1,13 @@
+{
+  "id": "r07-migration-drop-column",
+  "title": "Column dropped while old code still reads it",
+  "layer": "review",
+  "clean": false,
+  "description": "Phone moved to contacts table.",
+  "expect": [
+    {
+      "category": "data",
+      "file": "db/migrations/0042_drop_phone.sql"
+    }
+  ]
+}

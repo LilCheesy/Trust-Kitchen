@@ -1,0 +1,13 @@
+{
+  "id": "d10-shell-true",
+  "title": "User file name passed to a shell",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Export to PDF.",
+  "expect": [
+    {
+      "rule": "dangerous_call",
+      "file": "app/export/pdf.py"
+    }
+  ]
+}

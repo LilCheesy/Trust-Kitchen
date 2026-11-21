@@ -1,0 +1,8 @@
+{
+  "id": "c07-log-message",
+  "title": "Clearer error message",
+  "layer": "review",
+  "clean": true,
+  "description": "Better error message for used coupons.",
+  "expect": []
+}

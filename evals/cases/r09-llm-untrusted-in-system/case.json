@@ -1,0 +1,13 @@
+{
+  "id": "r09-llm-untrusted-in-system",
+  "title": "Uploaded document placed in the system prompt with tools on",
+  "layer": "review",
+  "clean": false,
+  "description": "Chat with your documents.",
+  "expect": [
+    {
+      "category": "security",
+      "file": "app/assistant/chat.py"
+    }
+  ]
+}

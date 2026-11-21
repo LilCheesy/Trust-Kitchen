@@ -1,0 +1,5 @@
+diff --git a/web/src/login.ts b/web/src/login.ts
+--- a/web/src/login.ts
++++ b/web/src/login.ts
+@@ -33,0 +33,1 @@
++  console.log('login ok', session.token)

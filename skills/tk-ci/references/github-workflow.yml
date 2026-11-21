@@ -1,0 +1,152 @@
+# Trust Kitchen deterministic review for pull requests.
+# Before enabling: replace every <PIN-TO-SHA> with the full commit SHA of the action release you reviewed.
+# The review tools, config and policy come from the BASE branch: a pull request can never change its own judge.
+# Trust Kitchen must already be installed on the base branch (merge the install PR first).
+name: trust-kitchen
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the pull request (read as data only)
+        uses: actions/checkout@<PIN-TO-SHA>
+        with:
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check out the review tools from the base branch
+        uses: actions/checkout@<PIN-TO-SHA>
+        with:
+          path: base
+          ref: ${{ github.event.pull_request.base.sha }}
+          sparse-checkout: .trust-kitchen
+          persist-credentials: false
+      - uses: actions/setup-python@<PIN-TO-SHA>
+        with:
+          python-version: "3.12"
+      # Add the project's own checks here (from .trust-kitchen/config.json), run inside `pr`. The LAST check step
+      # must record that they passed; without it the gate treats the checks as missing and never says MERGE:
+      # - run: npm ci && npm run lint && npm test
+      #   working-directory: pr
+      # - run: echo "TK_CHECKS=passed" >> "$GITHUB_ENV"
+      - name: Scan and gate
+        # Runs from the workspace root, never inside `pr`, and every python is isolated (-I): a file such as
+        # pr/json.py must not be importable by the review tools.
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          TK="$PWD/base/.trust-kitchen"
+          if [ ! -f "$TK/scripts/tk_scan.py" ]; then
+            echo "Trust Kitchen is not on the base branch yet: merge the install first." >&2; exit 1
+          fi
+          printf '%s' "$PR_BODY" > pr.md
+          CFG=(); [ -f "$TK/config.json" ] && CFG=(--config "$TK/config.json")
+          set +e
+          (cd pr && python -I "$TK/scripts/tk_scan.py" --base "$BASE_SHA" --description @../pr.md "${CFG[@]}") > scan.json
+          SCAN=$?
+          set -e
+          if [ "$SCAN" -eq 2 ]; then echo "The scanner could not run: nothing was checked." >&2; exit 1; fi
+          python -I - <<'PY'
+          import json, os
+          scan = json.load(open("scan.json", encoding="utf-8"))
+          findings = []
+          for f in scan["findings"]:
+              if f.get("severity") == "MAJOR":  # pattern hits a person may dismiss: shown, never a red check alone
+                  f = {**f, "confidence": 2, "why": f["why"] + " (heuristic: confirm or dismiss in review)"}
+              findings.append(f)
+          facts = {"deterministic": os.environ.get("TK_CHECKS") or "missing",  # set by the project's check steps
+                   "verify": "not_applicable" if scan["stats"]["docs_only"] else "missing",
+                   "docs_only": scan["stats"]["docs_only"], "changed_lines": scan["stats"]["changed_lines"],
+                   "areas": scan["areas"], "findings": findings}
+          json.dump(facts, open("facts.json", "w", encoding="utf-8"))
+          PY
+          POLICY=(); [ -f "$TK/policy.json" ] && POLICY=(--policy "$TK/policy.json")
+          set +e
+          python -I "$TK/scripts/merge_gate.py" facts.json "${POLICY[@]}" > verdict.json
+          GATE=$?
+          set -e
+          if [ ! -s verdict.json ]; then echo "The merge gate could not run: nothing was decided." >&2; exit 1; fi
+          python -I -c "import json;v=json.load(open('verdict.json'));print('Verdict:',v['verdict']);[print('-',r) for r in v['reasons']+v['notes']]" | tee -a "$GITHUB_STEP_SUMMARY"
+          # 3 = CHANGES_REQUESTED fails the check; 2 = NEEDS_HUMAN passes it but says so; a person still merges
+          if [ "$GATE" -eq 3 ]; then exit 1; fi
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@<PIN-TO-SHA>
+        with:
+          name: trust-kitchen
+          path: |
+            scan.json
+            verdict.json
+          if-no-files-found: warn
+
+  # OPTIONAL (opt-in): show the result on the pull request as ONE comment, updated on every push, for the
+  # repository owner to read. It never approves, requests changes or merges. It runs no PR code and skips fork PRs
+  # (their token is read-only). Delete this job if you only want the status check.
+  comment:
+    needs: review
+    if: always() && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/download-artifact@<PIN-TO-SHA>
+        continue-on-error: true
+        with:
+          name: trust-kitchen
+      - name: Build the comment
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          python3 -I - <<'PY'
+          import json, os
+          def load(p):
+              try:
+                  return json.load(open(p, encoding="utf-8"))
+              except (OSError, ValueError):
+                  return None
+          def cell(s):  # text from the diff is untrusted: no table breaks, code spans, HTML, links or mentions
+              s = str(s).replace("\\", "\\\\").replace("|", "\\|").replace("`", "'").replace("<", "&lt;")
+              s = s.replace(">", "&gt;").replace("[", "\\[").replace("]", "\\]").replace("@", "@​").replace("://", ":/​/")
+              return " ".join(s.split())[:200]
+          head = os.environ["HEAD_SHA"]
+          scan, verdict = load("scan.json"), load("verdict.json")
+          order = ["BLOCKER", "MAJOR", "MINOR", "NIT"]
+          body = f"<!-- trust-kitchen-review -->\n## Trust Kitchen deterministic review\n\n"
+          body += "> Information for the repository owner. Trust Kitchen does not approve or merge; the decision is yours.\n\n"
+          if scan is None or verdict is None:
+              body += "**The review did not produce results** (see the workflow run). Nothing was checked.\n"
+          else:
+              body += f"**Verdict:** {cell(verdict['verdict'])}\n\n" + "".join(f"- {cell(r)}\n" for r in verdict["reasons"] + verdict.get("notes", []))
+              fs = sorted(scan.get("findings", []), key=lambda f: order.index(f["severity"]) if f.get("severity") in order else 9)
+              if fs:
+                  body += "\n| Severity | Where | Rule | Problem | Fix |\n|---|---|---|---|---|\n"
+                  body += "".join(f"| {cell(f['severity'])} | {cell(f['file'])}:{cell(f['line'])} | {cell(f['rule'])} | {cell(f['why'])} | {cell(f['fix'])} |\n" for f in fs[:50])
+              else:
+                  body += "\nNo deterministic findings.\n"
+              body += f"\nAreas: {cell(', '.join(scan.get('areas', [])) or 'none')}\n"
+          body += f"\n<sub>head {head[:7]} · updated on every push</sub>\n"
+          json.dump({"body": body}, open("comment.json", "w", encoding="utf-8"))
+          PY
+      - name: Post or update the comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          ID=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
+                 --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- trust-kitchen-review -->"))) | .id' | head -n1)
+          if [ -n "$ID" ]; then
+            gh api "repos/$REPO/issues/comments/$ID" --method PATCH --input comment.json > /dev/null
+          else
+            gh api "repos/$REPO/issues/$PR/comments" --method POST --input comment.json > /dev/null
+          fi

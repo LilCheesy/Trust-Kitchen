@@ -1,0 +1,5 @@
+diff --git a/web/src/__tests__/cart.test.ts b/web/src/__tests__/cart.test.ts
+--- a/web/src/__tests__/cart.test.ts
++++ b/web/src/__tests__/cart.test.ts
+@@ -12,0 +12,1 @@
++it.only('adds an item', () => {

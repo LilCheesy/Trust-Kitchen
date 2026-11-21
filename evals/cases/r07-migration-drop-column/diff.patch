@@ -1,0 +1,5 @@
+diff --git a/db/migrations/0042_drop_phone.sql b/db/migrations/0042_drop_phone.sql
+--- a/db/migrations/0042_drop_phone.sql
++++ b/db/migrations/0042_drop_phone.sql
+@@ -1,0 +1,1 @@
++ALTER TABLE customers DROP COLUMN phone;

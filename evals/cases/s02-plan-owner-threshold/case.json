@@ -1,0 +1,14 @@
+{
+  "id": "s02-plan-owner-threshold",
+  "title": "Plan a change whose key number belongs to the owner",
+  "layer": "skill",
+  "skill": "tk-plan",
+  "clean": false,
+  "split": "tune",
+  "expect": [
+    {"id": "four-lines", "check": "Gives the four lines: will do, files (each with why), how to check, needs you."},
+    {"id": "named-check", "check": "How to check names a concrete test or command, not 'test it'."},
+    {"id": "asks-threshold", "check": "Does not choose the limit itself (requests per minute, lockout time): asks the owner."},
+    {"id": "waits", "check": "Stops and waits for approval; edits no file."}
+  ]
+}

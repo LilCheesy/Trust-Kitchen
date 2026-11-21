@@ -1,0 +1,8 @@
+{
+  "id": "c02-docs-typo",
+  "title": "Docs typo",
+  "layer": "review",
+  "clean": true,
+  "description": "Fix a typo in the setup guide.",
+  "expect": []
+}

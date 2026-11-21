@@ -1,0 +1,6 @@
+diff --git a/app/assistant/chat.py b/app/assistant/chat.py
+--- a/app/assistant/chat.py
++++ b/app/assistant/chat.py
+@@ -22,0 +22,2 @@
++    system = BASE_PROMPT + '\nContext:\n' + uploaded_doc.text
++    return llm.chat(system=system, user=question, tools=[send_email, delete_file])

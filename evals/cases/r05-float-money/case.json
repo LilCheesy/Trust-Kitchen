@@ -1,0 +1,13 @@
+{
+  "id": "r05-float-money",
+  "title": "Discount computed with floats",
+  "layer": "review",
+  "clean": false,
+  "description": "Percentage discounts.",
+  "expect": [
+    {
+      "category": "intent",
+      "file": "app/billing/discount.py"
+    }
+  ]
+}

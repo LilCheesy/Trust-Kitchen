@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LilCheesy/Trust-Kitchen/schema/finding.schema.json",
+  "title": "Trust Kitchen review finding",
+  "type": "object",
+  "required": ["rule", "category", "severity", "file", "line", "why", "evidence", "confidence", "fix", "encode"],
+  "properties": {
+    "rule": { "type": "string", "description": "short slug, e.g. symptom_fix, idor, n_plus_one" },
+    "category": { "enum": ["intent", "architecture", "slop", "tests", "security", "blast-radius", "verify", "performance", "data", "process"] },
+    "severity": { "enum": ["BLOCKER", "MAJOR", "MINOR", "NIT"] },
+    "file": { "type": "string" },
+    "line": { "type": "integer", "minimum": 0 },
+    "why": { "type": "string", "description": "the harm, one sentence" },
+    "evidence": { "type": "string", "description": "command + output, or exact code + traced path; secrets redacted" },
+    "confidence": { "type": "integer", "minimum": 1, "maximum": 5, "description": "1 said · 2 pointed · 3 traced · 4 ran against real code · 5 reproduced in the app" },
+    "fix": { "type": "string", "description": "smallest fix that removes the cause" },
+    "encode": { "type": ["string", "null"], "description": "lint / type / test that would stop this class of mistake" },
+    "source": { "type": "string", "description": "deterministic or the reviewer skill name" },
+    "path": { "type": "array", "items": { "type": "string" }, "description": "security: source → sink hops with file:line" },
+    "cvss": { "type": "string", "description": "security: CVSS 3.1 vector" }
+  }
+}

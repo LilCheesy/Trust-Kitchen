@@ -1,0 +1,1 @@
+{"id": "h02-ts-ignore-added", "title": "A type error is silenced", "layer": "deterministic", "clean": false, "split": "holdout", "description": "Fix the build.", "expect": [{"rule": "lint_suppression", "file": "web/src/cart.ts"}]}

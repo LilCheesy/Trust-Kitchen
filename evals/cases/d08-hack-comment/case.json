@@ -1,0 +1,13 @@
+{
+  "id": "d08-hack-comment",
+  "title": "Validation bypass explained in a comment",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Speed up order creation.",
+  "expect": [
+    {
+      "rule": "excuse_comment",
+      "file": "app/orders/service.py"
+    }
+  ]
+}

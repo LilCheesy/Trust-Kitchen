@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="200" viewBox="0 0 880 200" role="img" aria-label="Trust Kitchen">
+  <title>Trust Kitchen</title>
+  <g transform="translate(40 30)">
+    <path d="M70 0 L130.6 35 L130.6 105 L70 140 L9.4 105 L9.4 35 Z" fill="none" stroke="#0E9F7E" stroke-width="18" stroke-linejoin="round"/>
+    <path d="M38 72 L61 95 L104 50" fill="none" stroke="#0E9F7E" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="210" y="122" font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="88" font-weight="700" letter-spacing="-2" fill="#111418">Trust Kitchen</text>
+</svg>

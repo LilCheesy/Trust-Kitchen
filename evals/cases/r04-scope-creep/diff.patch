@@ -1,0 +1,14 @@
+diff --git a/app/billing/config.py b/app/billing/config.py
+--- a/app/billing/config.py
++++ b/app/billing/config.py
+@@ -3,2 +3,2 @@
+-PAYMENT_TIMEOUT_S = 30
+-ROUNDING = 'ROUND_HALF_UP'
++PAYMENT_TIMEOUT_S = 5
++ROUNDING = 'ROUND_DOWN'
+diff --git a/app/billing/messages.py b/app/billing/messages.py
+--- a/app/billing/messages.py
++++ b/app/billing/messages.py
+@@ -1,1 +1,1 @@
+-RECEIPT_TITLE = 'Reciept'
++RECEIPT_TITLE = 'Receipt'

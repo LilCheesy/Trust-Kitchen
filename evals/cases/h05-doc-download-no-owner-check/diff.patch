@@ -1,0 +1,13 @@
+diff --git a/api/documents.py b/api/documents.py
+--- a/api/documents.py
++++ b/api/documents.py
+@@ -1,0 +1,9 @@
++from flask import Blueprint, send_file
++from .auth import login_required
++from .models import Document
++
++bp = Blueprint("documents", __name__)
++
++@bp.get("/documents/<int:doc_id>/pdf")
++@login_required
++def download(doc_id): return send_file(Document.query.get_or_404(doc_id).path)

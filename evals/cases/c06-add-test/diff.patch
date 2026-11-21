@@ -1,0 +1,6 @@
+diff --git a/tests/test_fee.py b/tests/test_fee.py
+--- a/tests/test_fee.py
++++ b/tests/test_fee.py
+@@ -20,0 +20,2 @@
++def test_fee_zero_weight_is_base_fee():
++    assert fee(0) == 15000

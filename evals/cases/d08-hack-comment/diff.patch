@@ -1,0 +1,6 @@
+diff --git a/app/orders/service.py b/app/orders/service.py
+--- a/app/orders/service.py
++++ b/app/orders/service.py
+@@ -71,0 +71,2 @@
++    # HACK: skip address validation for now, the partner API is slow
++    return create_order(cart, validate=False)

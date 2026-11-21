@@ -1,0 +1,7 @@
+diff --git a/app/settings.py b/app/settings.py
+--- a/app/settings.py
++++ b/app/settings.py
+@@ -12,1 +12,3 @@
+ DEBUG = False
++STORAGE_BUCKET = 'invoices'
++AWS_ACCESS_KEY_ID = 'AKIAQ7WEXAMPLE4KD2Z9'

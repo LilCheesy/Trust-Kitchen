@@ -1,0 +1,15 @@
+{
+  "id": "s01-investigate-fixed-on-main",
+  "title": "Bug report without access to the code: ask, plan, do not guess",
+  "layer": "skill",
+  "skill": "tk-investigate",
+  "clean": false,
+  "split": "tune",
+  "expect": [
+    {"id": "no-guessed-cause", "check": "States no root cause, because no code was read; anything offered is labelled a hypothesis."},
+    {"id": "asks-for-access", "check": "Says what it needs to reproduce: the repository, the reported version, steps or logs."},
+    {"id": "plans-both-versions", "check": "Plans to reproduce on the reported version AND on the latest default branch."},
+    {"id": "plans-fixed-check", "check": "Says that if the bug is gone on the default branch it will find the fixing commit and stop."},
+    {"id": "no-code-change", "check": "Makes no code change and proposes no patch."}
+  ]
+}

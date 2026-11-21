@@ -1,0 +1,11 @@
+diff --git a/app/billing/coupons.py b/app/billing/coupons.py
+--- a/app/billing/coupons.py
++++ b/app/billing/coupons.py
+@@ -1,0 +1,7 @@
++def redeem(code, order):
++    c = Coupon.get(code)
++    if c.used:
++        raise CouponUsed()
++    order.apply(c.amount)
++    c.used = True
++    c.save()

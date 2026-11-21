@@ -1,0 +1,8 @@
+{
+  "id": "c03-rename-local",
+  "title": "Rename a local variable",
+  "layer": "review",
+  "clean": true,
+  "description": "Clearer variable name.",
+  "expect": []
+}

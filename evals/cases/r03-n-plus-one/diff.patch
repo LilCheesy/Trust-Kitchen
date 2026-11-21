@@ -1,0 +1,10 @@
+diff --git a/app/reports/sales.py b/app/reports/sales.py
+--- a/app/reports/sales.py
++++ b/app/reports/sales.py
+@@ -5,0 +5,6 @@
++def report(orders):
++    rows = []
++    for o in orders:
++        customer = db.query(Customer).filter_by(id=o.customer_id).one()
++        rows.append((o.id, customer.name, o.total))
++    return rows

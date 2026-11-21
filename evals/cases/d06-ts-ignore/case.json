@@ -1,0 +1,13 @@
+{
+  "id": "d06-ts-ignore",
+  "title": "Type error silenced",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Fix build.",
+  "expect": [
+    {
+      "rule": "lint_suppression",
+      "file": "web/src/cart.ts"
+    }
+  ]
+}

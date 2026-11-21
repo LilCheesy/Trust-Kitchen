@@ -1,0 +1,7 @@
+diff --git a/db/views/orders.sql b/db/views/orders.sql
+--- a/db/views/orders.sql
++++ b/db/views/orders.sql
+@@ -1,2 +1,2 @@
+--- orders by customer
++-- orders by customer, newest first
+ select id, customer_id, created_at from orders order by created_at desc;

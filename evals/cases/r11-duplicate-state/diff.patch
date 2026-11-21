@@ -1,0 +1,6 @@
+diff --git a/app/accounts/models.py b/app/accounts/models.py
+--- a/app/accounts/models.py
++++ b/app/accounts/models.py
+@@ -12,0 +12,2 @@
++    is_active = Column(Boolean, default=True)
++    status = Column(String, default='active')  # mirrors is_active

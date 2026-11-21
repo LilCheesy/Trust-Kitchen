@@ -1,0 +1,12 @@
+{
+  "id": "d15-large-diff",
+  "title": "Huge generated change",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Regenerate tables.",
+  "expect": [
+    {
+      "rule": "large_diff"
+    }
+  ]
+}

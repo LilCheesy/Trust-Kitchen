@@ -1,0 +1,10 @@
+{
+  "name": "trust-kitchen",
+  "version": "0.3.0",
+  "description": "Skills for trustworthy AI-assisted engineering: evidence-first work, parallel code and PR review with a testable merge gate, defensive security review, and a learn-rules loop that turns recurring mistakes into machine checks.",
+  "author": { "name": "LilCheesy" },
+  "homepage": "https://github.com/LilCheesy/Trust-Kitchen",
+  "repository": "https://github.com/LilCheesy/Trust-Kitchen",
+  "license": "MIT",
+  "keywords": ["code-review", "pull-request", "security", "agents", "quality", "evidence"]
+}

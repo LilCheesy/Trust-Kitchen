@@ -1,0 +1,13 @@
+{
+  "id": "r10-coupon-race",
+  "title": "Coupon checked then used in two steps",
+  "layer": "review",
+  "clean": false,
+  "description": "Single-use coupons.",
+  "expect": [
+    {
+      "category": "security",
+      "file": "app/billing/coupons.py"
+    }
+  ]
+}

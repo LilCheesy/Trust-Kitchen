@@ -1,0 +1,8 @@
+diff --git a/app/api/users.py b/app/api/users.py
+--- a/app/api/users.py
++++ b/app/api/users.py
+@@ -90,0 +90,4 @@
++@router.delete('/users/{user_id}')
++def delete_user(user_id: int, user=Depends(current_user)):
++    db.delete(db.get(User, user_id))
++    db.commit()

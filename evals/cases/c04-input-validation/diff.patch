@@ -1,0 +1,16 @@
+diff --git a/app/api/cart.py b/app/api/cart.py
+--- a/app/api/cart.py
++++ b/app/api/cart.py
+@@ -10,3 +10,3 @@
+-class AddItem(BaseModel):
+-    sku: str
+-    quantity: int
++class AddItem(BaseModel):
++    sku: str
++    quantity: conint(ge=1, le=99)
+diff --git a/tests/test_cart_api.py b/tests/test_cart_api.py
+--- a/tests/test_cart_api.py
++++ b/tests/test_cart_api.py
+@@ -1,0 +1,2 @@
++def test_quantity_must_be_positive(client):
++    assert client.post('/cart', json={'sku': 'A', 'quantity': 0}).status_code == 422

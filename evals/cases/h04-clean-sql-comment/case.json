@@ -1,0 +1,1 @@
+{"id": "h04-clean-sql-comment", "title": "Reword a SQL comment and add an index", "layer": "deterministic", "clean": true, "split": "holdout", "description": "Speed up order lookups by customer.", "expect": []}

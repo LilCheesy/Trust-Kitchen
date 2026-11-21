@@ -1,0 +1,13 @@
+{
+  "id": "d09-console-log-token",
+  "title": "Token logged in the browser",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Login flow.",
+  "expect": [
+    {
+      "rule": "debug_leftover",
+      "file": "web/src/login.ts"
+    }
+  ]
+}

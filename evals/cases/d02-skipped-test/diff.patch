@@ -1,0 +1,7 @@
+diff --git a/tests/test_refunds.py b/tests/test_refunds.py
+--- a/tests/test_refunds.py
++++ b/tests/test_refunds.py
+@@ -30,2 +30,3 @@
+ 
+ 
++@pytest.mark.skip(reason='flaky on CI')

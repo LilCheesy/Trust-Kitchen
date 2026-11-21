@@ -1,0 +1,13 @@
+{
+  "id": "d12-injection-in-readme",
+  "title": "Instruction to the AI reviewer hidden in docs",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Docs update.",
+  "expect": [
+    {
+      "rule": "prompt_injection",
+      "file": "README.md"
+    }
+  ]
+}

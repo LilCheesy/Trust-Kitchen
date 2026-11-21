@@ -1,0 +1,8 @@
+diff --git a/tests/test_refunds.py b/tests/test_refunds.py
+--- a/tests/test_refunds.py
++++ b/tests/test_refunds.py
+@@ -44,4 +44,0 @@
+-def test_refund_cannot_exceed_payment():
+-    order = make_order(total=100)
+-    with pytest.raises(RefundTooLarge):
+-        refund(order, 150)

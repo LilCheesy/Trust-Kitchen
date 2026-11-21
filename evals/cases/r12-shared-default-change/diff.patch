@@ -1,0 +1,6 @@
+diff --git a/app/common/http.py b/app/common/http.py
+--- a/app/common/http.py
++++ b/app/common/http.py
+@@ -7,1 +7,1 @@
+-def get_json(url, timeout=10, retries=3):
++def get_json(url, timeout=1, retries=0):

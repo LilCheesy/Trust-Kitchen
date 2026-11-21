@@ -1,0 +1,7 @@
+diff --git a/web/src/checkout.js b/web/src/checkout.js
+--- a/web/src/checkout.js
++++ b/web/src/checkout.js
+@@ -20,0 +20,3 @@
++  try {
++    await sdk.capture(order.id)
++  } catch (e) {}

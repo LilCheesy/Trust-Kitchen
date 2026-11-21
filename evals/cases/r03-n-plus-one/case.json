@@ -1,0 +1,13 @@
+{
+  "id": "r03-n-plus-one",
+  "title": "Query per order line in a loop",
+  "layer": "review",
+  "clean": false,
+  "description": "Monthly sales report (about 50k orders).",
+  "expect": [
+    {
+      "category": "performance",
+      "file": "app/reports/sales.py"
+    }
+  ]
+}

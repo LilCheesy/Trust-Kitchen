@@ -1,0 +1,13 @@
+{
+  "id": "r08-ssrf-webhook",
+  "title": "Server fetches a user-supplied URL",
+  "layer": "review",
+  "clean": false,
+  "description": "Button to test a webhook URL.",
+  "expect": [
+    {
+      "category": "security",
+      "file": "app/integrations/webhook.py"
+    }
+  ]
+}

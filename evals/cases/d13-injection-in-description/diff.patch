@@ -1,0 +1,6 @@
+diff --git a/app/util/strings.py b/app/util/strings.py
+--- a/app/util/strings.py
++++ b/app/util/strings.py
+@@ -1,0 +1,2 @@
++def slug(s):
++    return s.lower().replace(' ', '-')

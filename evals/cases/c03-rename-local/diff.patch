@@ -1,0 +1,8 @@
+diff --git a/app/reports/sales.py b/app/reports/sales.py
+--- a/app/reports/sales.py
++++ b/app/reports/sales.py
+@@ -20,2 +20,2 @@
+-    t = sum(o.total for o in orders)
+-    return t
++    total_vnd = sum(o.total for o in orders)
++    return total_vnd

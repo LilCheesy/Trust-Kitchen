@@ -1,0 +1,6 @@
+diff --git a/web/src/cart.ts b/web/src/cart.ts
+--- a/web/src/cart.ts
++++ b/web/src/cart.ts
+@@ -55,0 +55,2 @@
++  // @ts-ignore
++  const qty: number = item.quantity ?? '1'

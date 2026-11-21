@@ -1,0 +1,6 @@
+diff --git a/app/billing/discount.py b/app/billing/discount.py
+--- a/app/billing/discount.py
++++ b/app/billing/discount.py
+@@ -1,0 +1,2 @@
++def apply(total_vnd: int, pct: float) -> float:
++    return total_vnd * (1 - pct / 100)

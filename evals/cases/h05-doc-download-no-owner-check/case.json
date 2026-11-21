@@ -1,0 +1,1 @@
+{"id": "h05-doc-download-no-owner-check", "title": "Download a document by id", "layer": "review", "clean": false, "split": "holdout", "description": "Let users download their invoices as PDF.", "expect": [{"category": "security", "file": "api/documents.py"}]}

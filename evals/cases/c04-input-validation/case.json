@@ -1,0 +1,8 @@
+{
+  "id": "c04-input-validation",
+  "title": "Validate quantity at the API edge",
+  "layer": "review",
+  "clean": true,
+  "description": "Reject zero or huge quantities.",
+  "expect": []
+}

@@ -1,0 +1,13 @@
+{
+  "id": "r12-shared-default-change",
+  "title": "Default of a shared helper changed",
+  "layer": "review",
+  "clean": false,
+  "description": "Make the health check faster.",
+  "expect": [
+    {
+      "category": "blast-radius",
+      "file": "app/common/http.py"
+    }
+  ]
+}

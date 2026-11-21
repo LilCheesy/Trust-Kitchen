@@ -1,0 +1,8 @@
+{
+  "id": "c05-safe-load",
+  "title": "Switch to safe YAML loading",
+  "layer": "review",
+  "clean": true,
+  "description": "Use the safe_load shortcut.",
+  "expect": []
+}

@@ -1,0 +1,5 @@
+diff --git a/app/imports/config.py b/app/imports/config.py
+--- a/app/imports/config.py
++++ b/app/imports/config.py
+@@ -8,0 +8,1 @@
++    cfg = yaml.load(upload.read())

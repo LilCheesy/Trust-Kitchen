@@ -1,0 +1,13 @@
+{
+  "id": "d07-py-suppressions",
+  "title": "Linters silenced in auth helper",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Lint cleanup.",
+  "expect": [
+    {
+      "rule": "lint_suppression",
+      "file": "app/auth/tokens.py"
+    }
+  ]
+}

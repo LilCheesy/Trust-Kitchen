@@ -1,0 +1,13 @@
+{
+  "id": "d04-sleep-race",
+  "title": "Sleep added to dodge a race",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Fix intermittent missing rows.",
+  "expect": [
+    {
+      "rule": "symptom_fix",
+      "file": "app/sync/worker.py"
+    }
+  ]
+}

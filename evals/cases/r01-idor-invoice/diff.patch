@@ -1,0 +1,7 @@
+diff --git a/app/api/invoices.py b/app/api/invoices.py
+--- a/app/api/invoices.py
++++ b/app/api/invoices.py
+@@ -40,0 +40,3 @@
++@router.get('/invoices/{invoice_id}')
++def get_invoice(invoice_id: int, user=Depends(current_user)):
++    return db.query(Invoice).get(invoice_id)

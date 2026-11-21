@@ -1,0 +1,13 @@
+{
+  "id": "d01-secret-in-settings",
+  "title": "Cloud key committed in settings",
+  "layer": "deterministic",
+  "clean": false,
+  "description": "Configure invoice storage.",
+  "expect": [
+    {
+      "rule": "secret",
+      "file": "app/settings.py"
+    }
+  ]
+}

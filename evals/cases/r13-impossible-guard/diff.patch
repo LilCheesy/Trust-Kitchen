@@ -1,0 +1,10 @@
+diff --git a/app/orders/total.py b/app/orders/total.py
+--- a/app/orders/total.py
++++ b/app/orders/total.py
+@@ -1,0 +1,6 @@
++def total(order: Order) -> int:
++    if order is None:
++        return 0
++    if not isinstance(order.lines, list):
++        return 0
++    return sum(l.price * l.qty for l in order.lines)

@@ -1,0 +1,13 @@
+{
+  "id": "r01-idor-invoice",
+  "title": "Invoice fetched by id without ownership check",
+  "layer": "review",
+  "clean": false,
+  "description": "Let users download invoices.",
+  "expect": [
+    {
+      "category": "security",
+      "file": "app/api/invoices.py"
+    }
+  ]
+}
