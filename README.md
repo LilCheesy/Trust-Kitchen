@@ -8,6 +8,7 @@
 <h3 align="center">Ship fast. Prove it.</h3>
 
 <p align="center">
+  <a href="https://github.com/LilCheesy/Trust-Kitchen/actions/workflows/selfcheck.yml"><img alt="selfcheck" src="https://github.com/LilCheesy/Trust-Kitchen/actions/workflows/selfcheck.yml/badge.svg?branch=main"></a>
   <img alt="license" src="https://img.shields.io/badge/license-MIT-0E9F7E">
   <img alt="skills" src="https://img.shields.io/badge/skills-42-0E9F7E">
   <img alt="agents" src="https://img.shields.io/badge/agents-9-0E9F7E">
@@ -121,7 +122,8 @@ Every install also adds the review scripts to `.trust-kitchen/scripts/`, the eva
 and a default merge policy (auto-merge off) to `.trust-kitchen/policy.json`.
 
 - **Your files are safe.** A file Trust Kitchen did not write is never overwritten: it is skipped and reported. Rule
-  files change only inside a marked `trust-kitchen` block.
+  files change only inside a marked `trust-kitchen` block. The installer never writes, edits or deletes through a
+  symlink, so a link pointing outside your project cannot be used to change files elsewhere.
 - **Uninstall removes exactly what was installed**, except files you changed after installing (an edited
   `policy.json`, for example). Those are kept and listed.
 
@@ -161,6 +163,9 @@ and the menu. With a command it runs that skill straight away:
 
 Reviews on a pull request are posted as a **comment**, never as an approval: the repository owner reads them and
 decides what gets merged.
+
+A review only starts the reviewers the change needs (a docs change does not get a security or performance review),
+so small changes stay cheap in time and tokens.
 
 ### What `/tk review 42` does
 

@@ -12,7 +12,7 @@ RUNS WHEN:  By tk-spec before asking for approval, by tk-build before reporting,
 AFFECTS:    Reads only. Exit 1 when there is any error.
 CAUTION:    Skips .git, node_modules, virtualenvs, build output and binary files. A tag inside the spec itself is not
             counted as an anchor. Headings are matched case-insensitively and must be exactly the names below.
-CHANGED:    2026-11-21 · v0.3 · new (tests/test_spec_check.py written first)
+CHANGED:    2026-11-21 · v0.3 · new (tests written first)
             2026-11-21 · multi-part ids (SPEC-ABC-DEF-012), found on a multi-part id
             2026-11-21 · ids written as code (`AC-01`) accepted; repeated tag errors printed once
             2026-11-21 · tag ids read as whole numbers (AC-0123 was read as AC-012)

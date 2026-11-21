@@ -1,0 +1,85 @@
+# Public self-check: proves on every push that the pack installs, works and uninstalls cleanly, on Linux and Windows,
+# with the oldest supported Python and Node. It needs nothing but the published files.
+name: selfcheck
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  selfcheck:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    env:
+      AGENTS: claude-code,codex,cursor,gemini,windsurf,copilot,cline,kiro,opencode
+      PYTHONDONTWRITEBYTECODE: ""
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
+        with:
+          python-version: "3.10"
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af  # v4.1.0
+        with:
+          node-version: "18"
+
+      - name: Skills are well-formed and reachable
+        run: python scripts/check_skills.py
+
+      - name: Eval cases (tune and holdout)
+        run: |
+          python evals/run_eval.py
+          python evals/run_eval.py --split holdout
+
+      - name: Scanner catches a planted secret and stays quiet on clean code
+        run: |
+          key="AKIA$(printf 'QWERTYUIOPASDFGH')"
+          printf 'diff --git a/a.py b/a.py\n--- a/a.py\n+++ b/a.py\n@@ -1,0 +1,1 @@\n+KEY = "%s"\n' "$key" > bad.patch
+          printf 'diff --git a/a.py b/a.py\n--- a/a.py\n+++ b/a.py\n@@ -1,0 +1,1 @@\n+def add(a, b): return a + b\n' > ok.patch
+          set +e; python scripts/tk_scan.py --diff bad.patch > /dev/null; bad=$?; python scripts/tk_scan.py --diff ok.patch > /dev/null; ok=$?; set -e
+          echo "bad=$bad ok=$ok"; [ "$bad" -eq 1 ] && [ "$ok" -eq 0 ]
+
+      - name: Install, use and uninstall with Python and with Node
+        run: |
+          for tool in py node; do
+            p="proj-$tool"; mkdir "$p"
+            if [ "$tool" = py ]; then python installer/install.py install --dir "$p" --agents "$AGENTS" --yes
+            else node bin/trust-kitchen.js install --dir "$p" --agents "$AGENTS" --yes --no-color; fi
+            python "$p/.trust-kitchen/scripts/tk_selfcheck.py"
+            python "$p/.trust-kitchen/evals/run_eval.py" > /dev/null
+            if [ "$tool" = py ]; then python installer/install.py uninstall --dir "$p"
+            else node bin/trust-kitchen.js uninstall --dir "$p"; fi
+            left="$(find "$p" -mindepth 1)"; [ -z "$left" ] || { echo "left behind after uninstall:"; echo "$left"; exit 1; }
+          done
+
+      - name: Python and Node installers write the same bytes
+        run: |
+          mkdir a b
+          python installer/install.py install --dir a --agents "$AGENTS" --yes > /dev/null
+          node bin/trust-kitchen.js install --dir b --agents "$AGENTS" --yes --no-color > /dev/null
+          diff -r -x install.json a b
+
+      - name: Installers never write through a symlink
+        if: runner.os == 'Linux'
+        run: |
+          for tool in py node; do
+            p="link-$tool"; mkdir -p "$p" outside; printf 'outside\n' > outside/notes.md
+            ln -s "$PWD/outside/notes.md" "$p/AGENTS.md"
+            set +e
+            if [ "$tool" = py ]; then python installer/install.py install --dir "$p" --agents codex --yes; else
+              node bin/trust-kitchen.js install --dir "$p" --agents codex --yes --no-color; fi
+            code=$?; set -e
+            echo "$tool exit=$code"; [ "$code" -eq 2 ] && [ "$(cat outside/notes.md)" = outside ]
+          done

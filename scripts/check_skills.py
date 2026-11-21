@@ -6,7 +6,7 @@ WHAT:       For skills/*/SKILL.md and agents/*.md: frontmatter has `name` (kebab
             README.md; every `tk-*` name written in skills, references, agents or README is a real skill or agent.
             Prints one line per problem.
 WHY:        Docs drift and broken skills are caught by a machine on every change, not by someone remembering.
-RUNS WHEN:  `python scripts/check_skills.py` in CI and before every commit; tests/test_repo_rules.py runs it.
+RUNS WHEN:  `python scripts/check_skills.py` before every commit and in .github/workflows/selfcheck.yml.
 AFFECTS:    Reads only. Exit 1 when any problem is found.
 CAUTION:    The frontmatter parser handles the simple `key: value` form used in this repo, not full YAML.
 CHANGED:    2026-11-20 · v0.1 · new
@@ -32,7 +32,7 @@ CMD_ROW = re.compile(r"^\|\s*`([a-z0-9-]+)`\s*\|\s*`(tk[a-z0-9-]*)`", re.M)  # |
 def hub_commands(hub_text: str) -> List[Tuple[str, str]]:
     """WHAT:       (command, skill) rows of the hub's `## Commands` table, in order; [] when there is no such section.
     WHY:          v0.3 — `/tk review 42` dispatches by this table, so the table itself is checked by machine.
-    RUNS WHEN:    check() below; tests/test_repo_rules.py.
+    RUNS WHEN:    check() below.
     AFFECTS:      Read-only. The hub skill (skills/tk/SKILL.md) is the only file with this table.
     CAUTION:      Only rows whose first two cells are `code` are read; prose rows are ignored on purpose.
     CHANGED:      2026-11-20 · v0.3 · new"""

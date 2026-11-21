@@ -25,6 +25,7 @@ CHANGED:    2026-11-20 · v0.2 · new
                          the user edited; the user's CRLF kept; only folders the installer created are removed;
                          no TTY and a corrupt manifest exit 2
             2026-11-21 · Linux container test: uninstall also removes the bytecode the installed scripts produced
+            2026-11-22 · external review: never write, edit or delete through a symlink inside the project
 """
 from __future__ import annotations
 
@@ -61,6 +62,13 @@ class _Run:
     def rel(self, p: Path) -> str:
         return p.relative_to(self.project).as_posix()
 
+    def guard(self, out: Path) -> None:
+        """Refuse to write when any part of the path inside the project is a symlink: it could point outside the
+        project and an install would edit someone else's file (external review, 2026-11-22)."""
+        through = _symlink_on_path(self.project, out)
+        if through:
+            raise ValueError(f"refusing to write through a symlink: {through} (it may point outside the project)")
+
     def mine(self, rel: str, out: Path) -> bool:
         """May Trust Kitchen write `rel`? Only if it does not exist, or Trust Kitchen wrote it and the user has not
         changed it since (the recorded sha256 still matches)."""
@@ -73,6 +81,7 @@ class _Run:
 
     def ensure_dir(self, d: Path) -> None:
         """Create `d` and record every folder that did not exist before, so uninstall removes only those."""
+        self.guard(d)
         missing = []
         while d != self.project and not d.exists():
             missing.append(d)
@@ -83,6 +92,7 @@ class _Run:
 
     def copy_file(self, src: Path, out: Path) -> None:
         rel = self.rel(out)
+        self.guard(out)
         if not self.mine(rel, out):
             self.skipped.append(rel)
             return
@@ -99,6 +109,7 @@ class _Run:
 
     def write_text(self, out: Path, text: str) -> None:
         rel = self.rel(out)
+        self.guard(out)
         if not self.mine(rel, out):
             self.skipped.append(rel)
             return
@@ -106,6 +117,17 @@ class _Run:
         out.write_text(text, encoding="utf-8", newline="\n")
         if rel not in self.files:
             self.files.append(rel)
+
+
+def _symlink_on_path(project: Path, target: Path) -> Optional[str]:
+    """WHAT: the first part of `target` (relative to `project`, the target itself included) that is a symlink, or
+    None. The project folder itself may be a symlink: the user chose it."""
+    cur = project
+    for part in target.relative_to(project).parts:
+        cur = cur / part
+        if cur.is_symlink():
+            return cur.relative_to(project).as_posix()
+    return None
 
 
 def _read_keep_eol(path: Path) -> str:
@@ -120,6 +142,7 @@ def _write_keep_eol(path: Path, text: str) -> None:
 
 def _put_block(run: _Run, path: Path, body: str, front: str = "") -> bool:
     """WHAT: insert / replace the marked block; returns True when the file did not exist before."""
+    run.guard(path)
     created = not path.exists()
     old = "" if created else _read_keep_eol(path)
     block = f"{START}\n{body.strip()}\n{END}\n"
@@ -199,6 +222,7 @@ def install(project: Path, agents: List[str], source: Path = HERE.parent) -> Dic
         "created_blocks": sorted(set(prev.get("created_blocks", [])) | set(created_blocks)),
         "created_dirs": sorted(set(prev.get("created_dirs", [])) | set(run.created_dirs)),
     }
+    run.guard(mpath)
     mpath.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8", newline="\n")
     return {"written": len(set(run.files)), "agents": manifest["agents"], "skills_dirs": skills_dirs,
             "skipped": sorted(set(run.skipped))}
@@ -240,6 +264,9 @@ def uninstall(project: Path) -> Dict[str, Any]:
     removed, kept = 0, []
     for rel in m.get("files", []):
         p = project / rel
+        if _symlink_on_path(project, p):
+            kept.append(rel)  # never delete through a symlink: the real file may be outside the project
+            continue
         if not p.is_file():
             continue
         if rel in hashes and _sha(p) != hashes[rel]:
@@ -254,8 +281,11 @@ def uninstall(project: Path) -> Dict[str, Any]:
             if cache.is_dir() and not any(cache.iterdir()):
                 cache.rmdir()
     for rel in m.get("blocks", []):
-        _drop_block(project / rel)
         p = project / rel
+        if _symlink_on_path(project, p):
+            kept.append(rel)
+            continue
+        _drop_block(p)
         if rel in m.get("created_blocks", []) and p.is_file():
             rest = re.sub(r"^---\r?\n.*?\r?\n---\r?\n", "", _read_keep_eol(p), count=1, flags=re.S)
             if not rest.strip():  # we created it and only our front matter is left
@@ -266,7 +296,7 @@ def uninstall(project: Path) -> Dict[str, Any]:
     else:  # manifests written before 2026-11-21: best effort, as before
         dirs = list({(project / r).parent for r in m.get("files", []) + m.get("blocks", [])} | {mpath.parent})
     for d in sorted(dirs, key=lambda x: len(x.parts), reverse=True):
-        if d != project and d.is_dir() and not any(d.iterdir()):
+        if d != project and not _symlink_on_path(project, d) and d.is_dir() and not any(d.iterdir()):
             d.rmdir()
     return {"removed": removed, "kept": kept}
 

@@ -12,8 +12,8 @@
  * RUNS WHEN:  `npx github:LilCheesy/Trust-Kitchen install [--agents a,b | 1,2] [--dir PATH] [--yes] [--no-color]`
  * AFFECTS:    Writes inside the target project only. Never overwrites a file it did not write or one the user changed
  *             (skipped); never deletes a changed file (kept) or a folder the user already had; keeps line endings.
- * CAUTION:    Keep in step with installer/install.py — tests/test_installer.py compares the two byte for byte.
- *             Exit codes: 0 ok · 1 nothing installed (update) · 2 bad input.
+ * CAUTION:    Keep in step with installer/install.py — .github/workflows/selfcheck.yml installs with both and compares the
+ *             two trees byte for byte. Exit codes: 0 ok · 1 nothing installed (update) · 2 bad input.
  * CHANGED:    2026-11-20 · v0.2 · new
  *             2026-11-20 · v0.3: `/tk` command files (putCommands), skipped files reported
  *             2026-11-21 · eval runner installed; user files never overwritten; edited files kept on uninstall
@@ -21,6 +21,7 @@
  *             2026-11-21 · second review: example cases installed; update keeps user edits; CRLF kept; only
  *                          created folders removed; agent numbers accepted (like Python)
  *             2026-11-21 · Linux container test: uninstall also removes the bytecode the installed scripts produced
+ *             2026-11-22 · external review: never write, edit or delete through a symlink inside the project
  */
 'use strict';
 const crypto = require('crypto');
@@ -61,6 +62,17 @@ const sha = (p) => crypto.createHash('sha256').update(fs.readFileSync(p)).digest
 const isFile = (p) => fs.existsSync(p) && fs.statSync(p).isFile();
 const isDir = (p) => fs.existsSync(p) && fs.statSync(p).isDirectory();
 const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+const isLink = (p) => { try { return fs.lstatSync(p).isSymbolicLink(); } catch { return false; } };
+// the first part of `target` inside `project` that is a symlink (target included), or null — mirrors
+// _symlink_on_path in installer/install.py (external review 2026-11-22: never write or delete through a symlink)
+function symlinkOnPath(project, target) {
+  let cur = project;
+  for (const part of path.relative(project, target).split(path.sep).filter(Boolean)) {
+    cur = path.join(cur, part);
+    if (isLink(cur)) return rel(cur, project);
+  }
+  return null;
+}
 
 /*
  * WHAT:       What one install run has written, skipped and created, plus the previous manifest it must respect.
@@ -76,13 +88,19 @@ function newRun(project, prev) {
     const recorded = (prev.hashes || {})[r];
     return !recorded || sha(out) === recorded;
   };
+  run.guard = (out) => {
+    const through = symlinkOnPath(project, out);
+    if (through) throw new Error(`refusing to write through a symlink: ${through} (it may point outside the project)`);
+  };
   run.ensureDir = (d) => {
+    run.guard(d);
     const missing = [];
     while (d !== project && !fs.existsSync(d)) { missing.push(d); d = path.dirname(d); }
     for (const m of missing.reverse()) { fs.mkdirSync(m); run.createdDirs.push(run.r(m)); }
   };
   run.copyFile = (src, out) => {
     const r = run.r(out);
+    run.guard(out);
     if (!run.mine(r, out)) { run.skipped.push(r); return; }
     run.ensureDir(path.dirname(out));
     fs.copyFileSync(src, out);
@@ -104,6 +122,7 @@ function newRun(project, prev) {
   };
   run.writeText = (out, text) => {
     const r = run.r(out);
+    run.guard(out);
     if (!run.mine(r, out)) { run.skipped.push(r); return; }
     run.ensureDir(path.dirname(out));
     fs.writeFileSync(out, text, 'utf8');
@@ -113,6 +132,7 @@ function newRun(project, prev) {
 }
 
 function putBlock(run, file, body, front) {
+  run.guard(file);
   const created = !fs.existsSync(file);
   const old = created ? '' : fs.readFileSync(file, 'utf8');
   const block = `${START}\n${body.trim()}\n${END}\n`;
@@ -188,6 +208,7 @@ function install(project, agents) {
     created_blocks: uniq([...(prev.created_blocks || []), ...createdBlocks]),
     created_dirs: uniq([...(prev.created_dirs || []), ...run.createdDirs]),
   };
+  run.guard(mpath);
   fs.writeFileSync(mpath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
   return { written: new Set(run.files).size, agents: manifest.agents, skillsDirs, skipped: uniq(run.skipped) };
 }
@@ -216,6 +237,7 @@ function uninstall(project) {
   let removed = 0; const kept = [];
   for (const r of m.files || []) {
     const p = path.join(project, r);
+    if (symlinkOnPath(project, p)) { kept.push(r); continue; }  // never delete through a symlink
     if (!isFile(p)) continue;
     if (hashes[r] && sha(p) !== hashes[r]) { kept.push(r); continue; }  // changed by the user after install
     fs.unlinkSync(p); removed++;
@@ -230,6 +252,7 @@ function uninstall(project) {
   }
   for (const r of m.blocks || []) {
     const p = path.join(project, r);
+    if (symlinkOnPath(project, p)) { kept.push(r); continue; }
     if (!isFile(p)) continue;
     let t = fs.readFileSync(p, 'utf8');
     if (t.includes(START) && t.includes(END)) {
@@ -246,7 +269,7 @@ function uninstall(project) {
     : [...new Set([...(m.files || []), ...(m.blocks || [])].map((r) => path.dirname(path.join(project, r))))]
       .concat([path.dirname(mpath)]);
   dirs.sort((a, b) => b.split(path.sep).length - a.split(path.sep).length);
-  for (const d of dirs) if (d !== project && isDir(d) && fs.readdirSync(d).length === 0) fs.rmdirSync(d);
+  for (const d of dirs) if (d !== project && !symlinkOnPath(project, d) && isDir(d) && fs.readdirSync(d).length === 0) fs.rmdirSync(d);
   return { removed, kept };
 }
 

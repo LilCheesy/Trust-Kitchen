@@ -12,7 +12,7 @@ WHAT:       Loads evals/cases/*/case.json. Three layers:
 WHY:        A skill is a process you can measure, like code with unit tests: run its cases on every change. Tune on one
             set until it is perfect; the holdout set, never looked at while tuning, is the honest number.
 RUNS WHEN:  `python evals/run_eval.py [--results DIR] [--second DIR] [--key key.json] [--split tune|holdout]`
-            and `python evals/run_eval.py blind OUT_DIR [--seed S]`; tests/test_eval.py runs both.
+            and `python evals/run_eval.py blind OUT_DIR [--seed S]`; .github/workflows/selfcheck.yml runs both splits.
 AFFECTS:    Prints a JSON report; exit 1 when a measured rate misses its target. `blind` writes OUT_DIR/work/* and
             OUT_DIR/key.json only.
 CAUTION:    Targets are ASSUMED defaults. NOT RUN is null, not 0. Give the agent OUT_DIR/work only, never key.json or
