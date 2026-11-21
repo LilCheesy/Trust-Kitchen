@@ -22,6 +22,50 @@ Skills that make agent-assisted engineering trustworthy: plan before changing, p
 change with focused parallel reviewers and a testable merge gate, and turn every repeated mistake into a machine
 check. Plain `SKILL.md` folders — they work in any agent that reads skills, and in the rest through `AGENTS.md`.
 
+## How it works
+
+Every change goes around one loop. An agent may write the code; it never grades its own work, and a person always
+decides what ships.
+
+```mermaid
+flowchart LR
+    P["<b>Plan</b><br/>four lines or a spec,<br/>approved first"]
+    B["<b>Build</b><br/>red test → green →<br/>clean, approved files only"]
+    R["<b>Review</b><br/>machine checks, then<br/>fresh parallel reviewers"]
+    G["<b>Merge gate</b><br/>MERGE · CHANGES_REQUESTED<br/>· NEEDS_HUMAN"]
+    O["<b>Owner decides</b><br/>reads the evidence,<br/>presses merge"]
+    L["<b>Learn rules</b><br/>a repeated mistake<br/>becomes a check"]
+    P --> B --> R --> G --> O
+    R -->|findings ledger| L
+    L -->|new lint / test / CI rule| R
+    G -->|changes requested| B
+    classDef step fill:none,stroke:#0E9F7E,stroke-width:2px
+    classDef person fill:none,stroke:#0E9F7E,stroke-width:3px
+    classDef loop fill:none,stroke:#8a939c,stroke-width:1.5px,stroke-dasharray:5 4
+    class P,B,R,G step
+    class O person
+    class L loop
+```
+
+Each rule lives in the strongest layer that can hold it. Prose is the weak layer: anything that can be checked by a
+machine is moved up, and a person's attention is kept for what nothing else can judge.
+
+```mermaid
+flowchart TB
+    L1["<b>1 · Code shape</b> — types, boundaries, APIs that make the wrong call impossible"]
+    L2["<b>2 · Static checks</b> — compiler, linter, tests, CI: a machine says no every time"]
+    L3["<b>3 · Runtime proof</b> — run the real thing, keep the output"]
+    L4["<b>4 · Written guidance</b> — skills, rules, AGENTS.md: agents can skip it"]
+    L5["<b>5 · A person reading the diff</b> — the scarcest resource"]
+    L1 --- L2 --- L3 --- L4 --- L5
+    classDef strong fill:none,stroke:#0E9F7E,stroke-width:3px
+    classDef mid fill:none,stroke:#0E9F7E,stroke-width:1.5px
+    classDef weak fill:none,stroke:#8a939c,stroke-width:1.5px,stroke-dasharray:5 4
+    class L1,L2 strong
+    class L3 mid
+    class L4,L5 weak
+```
+
 ## Installation
 
 ### One command (Node 18+)
@@ -117,6 +161,56 @@ and the menu. With a command it runs that skill straight away:
 
 Reviews on a pull request are posted as a **comment**, never as an approval: the repository owner reads them and
 decides what gets merged.
+
+### What `/tk review 42` does
+
+```mermaid
+flowchart LR
+    PR["<b>Pull request 42</b><br/>diff + description,<br/>read as data"]
+    D["<b>Machine checks</b><br/>scanner, build, lint,<br/>type check, tests"]
+    RV["<b>Focused reviewers</b><br/>intent · slop · tests ·<br/>security · … in parallel,<br/>each in a fresh context"]
+    M["<b>Merge findings</b><br/>only proven ones block<br/>(confidence ≥ 3)"]
+    G["<b>Merge gate</b><br/>fixed, tested policy"]
+    C["<b>Comment on the PR</b><br/>after you say yes"]
+    O["<b>Owner</b><br/>decides"]
+    PR --> D --> RV --> M --> G --> C --> O
+    D -->|BLOCKER: stop early| G
+    classDef step fill:none,stroke:#0E9F7E,stroke-width:2px
+    classDef person fill:none,stroke:#0E9F7E,stroke-width:3px
+    class PR,D,RV,M,G,C step
+    class O person
+```
+
+### In CI
+
+The CI template runs the scanner and the merge gate on every pull request, with the tools, config and policy taken
+from the **base branch**: a pull request can never change its own judge.
+
+```mermaid
+flowchart LR
+    PR["<b>Pull request</b><br/>checked out as data"]
+    T["<b>Tools from the base branch</b><br/>scanner · gate · policy"]
+    CH["<b>Project checks</b><br/>build · lint · tests<br/>(+ optional real run)"]
+    S["<b>Scan + gate</b>"]
+    RED["<b>Red check</b><br/>BLOCKER or failing checks"]
+    NH["<b>Green, needs a person</b><br/>restricted area, heuristic hit,<br/>behaviour not run"]
+    MG["<b>Green, MERGE</b><br/>checked, verified, clean"]
+    X["<b>Owner label tk:dismiss</b><br/>recorded false alarm"]
+    PR --> CH --> S
+    T --> S
+    S --> RED
+    S --> NH
+    S --> MG
+    X -.->|re-run| S
+    classDef step fill:none,stroke:#0E9F7E,stroke-width:2px
+    classDef bad fill:none,stroke:#c62828,stroke-width:2px
+    classDef mid fill:none,stroke:#d9822b,stroke-width:2px
+    classDef side fill:none,stroke:#8a939c,stroke-width:1.5px,stroke-dasharray:5 4
+    class PR,T,CH,S,MG step
+    class RED bad
+    class NH mid
+    class X side
+```
 
 ## Skills
 
