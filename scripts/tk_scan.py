@@ -44,7 +44,8 @@ TEST_SKIP = re.compile(r"(@pytest\.mark\.skip|@unittest\.skip|\bxit\(|\bxdescrib
 TEST_DEF = re.compile(r"^\s*(def test_\w+|(it|test)\(\s*['\"`]|func Test\w+\()")
 WEAK_ASSERT = re.compile(r"^\s*assert\s+True\b|expect\(true\)\.toBe\(true\)")
 SUPPRESSION = re.compile(r"(#\s*type:\s*ignore|#\s*noqa|eslint-disable|@ts-ignore|@ts-expect-error|#\s*pylint:\s*disable|"
-                         r"//\s*nolint|@SuppressWarnings|#\s*nosec|#\[allow\()")
+                         r"//\s*nolint|@SuppressWarnings|#\s*nosec|#\[allow\(|"
+                         r"\bunsafe\s*\{|\bas\s+any\b|:\s*any\b(?=\s*[,)=;{]))")  # + language escape hatches (2026-11-21)
 SYMPTOM = re.compile(r"(\btime\.sleep\(|\bsetTimeout\(|\bThread\.sleep\(|\bTask\.Delay\(|\basyncio\.sleep\(|"
                      r"catch\s*\([^)]*\)\s*\{\s*\}|\bcatch\s*\{\s*\})")
 EXCEPT_LINE = re.compile(r"^\s*except(\s+[\w.]+(\s+as\s+\w+)?)?\s*:\s*(#.*)?$")

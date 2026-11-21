@@ -22,7 +22,7 @@ None. This is the shared foundation.
 
 ## Procedure
 
-Apply these seven principles to every task.
+Apply these eight principles to every task.
 
 1. **Put each rule in the strongest layer that can hold it.** From strongest and cheapest to weakest and most
    expensive:
@@ -52,6 +52,14 @@ Apply these seven principles to every task.
    - Anything relying on an assumed limit is never called "safe" (`tk-limits`).
 7. **Trust first, then parallel.** Add more agents only when you can verify what they produce. Parallel reviewers
    work because each one is narrow, fresh, and must prove its findings.
+8. **Design for the least capable contributor.** Build the codebase, the conventions and the permissions for the
+   weakest agent or the newest intern, not for the best engineer.
+   - Strict types and lint rules.
+   - One obvious place for each thing.
+   - Footguns banned outside sanctioned places.
+   - Credentials that cannot reach production.
+
+   What the weakest contributor cannot get wrong, nobody gets wrong.
 
 ## Output
 

@@ -50,6 +50,11 @@ Do not use it for small local edits inside one function that keep its contract.
    wave. Two ways to do the same thing invite agents to use the wrong one.
 7. **Domain model.** A third special case in a third place means a concept is missing. Name the concept.
 8. **Idempotency.** Can jobs, retries and webhooks run twice safely?
+9. **The shortest path must be the right path.** Agents always take the quickest route, and copy what they see.
+   - Flag a change where the easy way to add something is not the project's convention: a new pattern next to an
+     existing one, or a feature spread across many folders when the codebase keeps each feature in one folder.
+   - Fix the convention so that the right way is the short way (co-locate a feature's code, tests and styles in
+     one directory; one obvious place per kind of thing). Then encode it with `tk-learn-rules`.
 
 ## Output
 

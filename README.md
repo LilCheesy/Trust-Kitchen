@@ -144,7 +144,7 @@ Each role greets you with a menu of codes and routes them to the skills below.
 
 | Skill | What it does |
 |---|---|
-| `tk-principles` | The seven working rules every skill assumes: the trust stack, evidence before claims, the author never grades their own work, every correction becomes a rule, small reversible steps, honest numbers, trust before parallelism. |
+| `tk-principles` | The eight working rules every skill assumes: the trust stack, evidence before claims, the author never grades their own work, every correction becomes a rule, small reversible steps, honest numbers, trust before parallelism, design for the least capable contributor. |
 | `tk-plan` | Four lines before any change (will do, files, how to check, needs you), explicit approval, and the eight stop points. |
 | `tk-evidence` | Evidence levels 0–5 for claims, confidence 1–5 for findings, MEASURED / COMMANDED / ASSUMED labels, "inconclusive" instead of guessing, redaction. |
 | `tk-limits` | Every limit declared with owner, value, unit, meaning, source and kind; assumed limits are never called safe. |
