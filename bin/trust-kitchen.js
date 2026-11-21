@@ -20,6 +20,7 @@
  *                          (sha256 in the manifest); exit 2 on bad input. Mirrors installer/install.py.
  *             2026-11-21 · second review: example cases installed; update keeps user edits; CRLF kept; only
  *                          created folders removed; agent numbers accepted (like Python)
+ *             2026-11-21 · Linux container test: uninstall also removes the bytecode the installed scripts produced
  */
 'use strict';
 const crypto = require('crypto');
@@ -218,6 +219,14 @@ function uninstall(project) {
     if (!isFile(p)) continue;
     if (hashes[r] && sha(p) !== hashes[r]) { kept.push(r); continue; }  // changed by the user after install
     fs.unlinkSync(p); removed++;
+    if (p.endsWith('.py')) {  // bytecode Python wrote when the script ran (found in a clean Linux container)
+      const cache = path.join(path.dirname(p), '__pycache__');
+      const stem = path.basename(p, '.py');
+      if (isDir(cache)) {
+        for (const f of fs.readdirSync(cache)) if (f.startsWith(`${stem}.`) && f.endsWith('.pyc')) fs.unlinkSync(path.join(cache, f));
+        if (fs.readdirSync(cache).length === 0) fs.rmdirSync(cache);
+      }
+    }
   }
   for (const r of m.blocks || []) {
     const p = path.join(project, r);

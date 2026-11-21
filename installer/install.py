@@ -24,6 +24,7 @@ CHANGED:    2026-11-20 · v0.2 · new
             2026-11-21 · second review: example eval cases installed (local results never); `update` keeps files
                          the user edited; the user's CRLF kept; only folders the installer created are removed;
                          no TTY and a corrupt manifest exit 2
+            2026-11-21 · Linux container test: uninstall also removes the bytecode the installed scripts produced
 """
 from __future__ import annotations
 
@@ -246,6 +247,12 @@ def uninstall(project: Path) -> Dict[str, Any]:
             continue
         p.unlink()
         removed += 1
+        if p.suffix == ".py":  # bytecode Python wrote when the script ran (found in a clean Linux container)
+            for pyc in (p.parent / "__pycache__").glob(f"{p.stem}.*.pyc"):
+                pyc.unlink()
+            cache = p.parent / "__pycache__"
+            if cache.is_dir() and not any(cache.iterdir()):
+                cache.rmdir()
     for rel in m.get("blocks", []):
         _drop_block(project / rel)
         p = project / rel
